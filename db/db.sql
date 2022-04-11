@@ -1,0 +1,3 @@
+DROP DATABASE IF EXISTS track_em;
+CREATE DATABASE track_em;
+USE track_em;

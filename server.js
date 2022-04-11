@@ -113,7 +113,7 @@ const viewEmployees = () => {
 };
 
 //ADD A DEPARTMENT
-const addDepartment = (answers.departmentName) => {
+const addDepartment = (newDepartment) => {
     db.query(`INSERT INTO department (department.name) VALUES(answers.departmentName)`, (err, data) => {
         if(err) {
             throw err
@@ -123,3 +123,5 @@ const addDepartment = (answers.departmentName) => {
         options();
     })
 };
+
+options();

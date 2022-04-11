@@ -1,6 +1,7 @@
-DROP DATABASE IF EXISTS track_em;
-CREATE DATABASE track_em;
 USE track_em;
+DROP TABLE IF EXISTS department;
+DROP TABLE IF EXISTS parties;
+DROP TABLE OF EXISTS employee;
 
 CREATE TABLE department (
     id INTEGER AUTO_INCREMENT PRIMARY KEY,
@@ -11,7 +12,7 @@ CREATE TABLE role (
     id INTEGER AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(30) NOT NULL,
     salary DECIMAL NOT NULL,
-    department_id INTEGER AUTO_INCREMENT NOT NULL,
+    department_id INTEGER NOT NULL,
     CONSTRAINT fk_department FOREIGN KEY (department_id) REFERENCES department(id)
     ON DELETE CASCADE
 );
