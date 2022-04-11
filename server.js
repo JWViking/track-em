@@ -1,15 +1,7 @@
 const mysql = require('mysql2');
 const inquirer = require('inquirer');
+const db = require('./db/connections');
 require('console.table');
-
-const db = mysql.createConnection (
-    {
-        host: 'localhost',
-        user: 'root',
-        password: 'IHatePasswords@123',
-        database: 'track_em'
-    }
-);
 
 //USER PROMPTS
 const options = () => {

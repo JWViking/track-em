@@ -1,6 +1,6 @@
 USE track_em;
 DROP TABLE IF EXISTS department;
-DROP TABLE IF EXISTS parties;
+DROP TABLE IF EXISTS role;
 DROP TABLE OF EXISTS employee;
 
 CREATE TABLE department (
