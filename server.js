@@ -42,7 +42,7 @@ const options = () => {
                 promptEmployee();
             }
             else if (answers.choices === 'update an employee role') {
-                updateEmployeeRole();
+                promptEmRole();
             }
             else {
                 console.log('Please make an appropriate choice from the menu.')
@@ -97,7 +97,7 @@ promptDepartment = () => {
     .then ((answers) => {
         if(answers) {
             addDepartment(answers);
-            options();
+            // options();
         } else {
             console.log ('Please enter a new department name.');
             promptDepartment();
@@ -112,8 +112,14 @@ const addDepartment = (answers) => {
         if(err) {
             throw err
         } else {
-            console.table(data)
-        }
+            // console.table(data)
+            db.query(`SELECT * FROM department`,(err, data) => {
+                if(err) {
+                    throw err
+                } else {
+                    console.table(data) 
+                }
+        })}
         options();
     })
 };
@@ -137,15 +143,25 @@ const promptRole = () => {
             message: 'What is the department_id of the new role? (Please enter a whole number value only)',
         },
     ])
-    let newRole = [answers.roleName, answers.roleWage, answers.newDepId];
-    addRole(newRole);
+    .then ((answers) => {
+        if(answers) {
+            addRole(answers);
+            // console.table(data);
+            // options();
+        }else {
+            console.log ('Please answer the prompt questions about your new role.')
+            promptRole();
+        }
+    })
 };
-const addRole = (newRole) => {
-    db.query(`INSERT INTO role (title, salary, department_id) VALUES(newRole)`, (err,data) => {
+const addRole = (answers) => {
+    const param = [answers.roleName, answers.roleWage, answers.newDepId];
+    ///add code for if table exists to drop so it can reload with new values.
+    db.query(`INSERT INTO role (title, salary, department_id) VALUES(?,?,?)`, param, (err,data) => {
         if(err) {
             throw err
         } else {
-            console.table(data)
+            viewRoles()
         }
         options();
     })
@@ -175,8 +191,10 @@ const promptEmployee = () => {
             message: 'What is the manager Id of the new employee? (Enter a number value only)'
         }
     ])
-    let newEmployee = [answers.mployeeFirst, answers.employeeLast, answers.roleId, answers.managerId];
-    addEmployee(newEmployee);
+    .then(answers => {
+        let newEmployee = [answers.employeeFirst, answers.employeeLast, answers.roleId, answers.managerId];
+        addEmployee(newEmployee);
+    });
 };
 
 const addEmployee = (newEmployee) => {
@@ -195,25 +213,55 @@ const promptEmRole = () => {
     inquirer.prompt ([
         {
             type: 'list',
-            name: 'updateRole',
+            name: 'employeeId',
             message: "Which employee's role do you want to update?",
             choices: () => { 
                 return new Promise ((resolve,reject) => {
                     let choicesArr = [];
-                    let sql = `SELECT * FROM roles`;
+                    let sql = `SELECT * FROM employee`;
                     db.query(sql, (err, res) => {
                         if (err) {
                             return reject(err);
                         }
                             for (let i=0; i<res.length; i++) {
-                                choicesArr.push({name: res[i].title, value: {id: res[i].id, title:res[i].title}});
+                                choicesArr.push({name: res[i].first_name+ res[i].last_name, value: res[i].id});
+                            }
+                            return resolve(choicesArr);
+                    })
+                })
+
+            },
+        },
+        {
+            type: 'list',
+            name: 'roleId',
+            message: "Please select the employee role.",
+            choices: () => { 
+                return new Promise ((resolve,reject) => {
+                    let choicesArr = [];
+                    let sql = `SELECT * FROM role`;
+                    db.query(sql, (err, res) => {
+                        if (err) {
+                            return reject(err);
+                        }
+                            for (let i=0; i<res.length; i++) {
+                                choicesArr.push({name: res[i].title, value: res[i].id});
                             }
                             return resolve(choicesArr);
                     })
 
-            })
-        },
-    
+                })
+            }    
+        }
+        
+    ])
+    .then(updateEmployee);
 };
+const updateEmployee = (answers) => {
+    console.log(answers);
+    db.query("UPDATE EMPLOYEE SET role_id = ? WHERE id=? ", [answers.roleId, answers.employeeId], (err) => {
+        options();
+     })
+}
 
 options();
